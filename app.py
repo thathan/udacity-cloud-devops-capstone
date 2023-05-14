@@ -13,6 +13,7 @@ def home():
 
 @app.route("/hello")
 def hello():
+    LOG.info("Received hello request")
     html = f"<h3>Hello from Thodoris' Cloud Devops Capstone project</h3>"
     return html.format(format)
 
