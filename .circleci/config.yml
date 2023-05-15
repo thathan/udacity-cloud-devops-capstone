@@ -47,8 +47,8 @@ jobs:
             apk add --no-cache py-pip
             pip install awscli
             set -x
-            DOCKER_VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$DOCKER_VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VER.tgz
+            DOCKER_VER="20.10.24"
+            curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
             mv /tmp/docker/* /usr/bin
       - run:
