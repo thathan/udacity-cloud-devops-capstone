@@ -39,6 +39,7 @@ jobs:
       - image: python:3.8.16-alpine3.18
     steps: 
       - checkout
+      - setup_remote_docker 
       - run: 
           name: Install dependencies
           command: |
