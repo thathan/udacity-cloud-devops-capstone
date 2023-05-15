@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  build:
+  linter:
     docker:
-      - image: python:3.7.3-stretch
+      - image: python:3.8
     working_directory: ~/repo
     steps:
       - checkout
@@ -34,3 +34,33 @@ jobs:
             hadolint Dockerfile
             pylint --disable=R,C,W1203,W1202 app.py
 
+  docker-build:
+    docker: 
+      - image: python:3.8.16-alpine3.18
+    steps: 
+      - checkout
+      - run: 
+          name: Install dependencies
+          command: |
+            apk add --no-cache py-pip
+            pip install awscli
+            set -x
+            DOCKER_VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$DOCKER_VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
+            mv /tmp/docker/* /usr/bin
+      - run:
+          name: Build docker image
+          command: 
+            docker build -t 689660317632.dkr.ecr.us-east-1.amazonaws.com/udacity-cloud-devops-capstone:1.0 .
+      - run: 
+          name: Push image to ECR repo
+          commad: 
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 689660317632.dkr.ecr.us-east-1.amazonaws.com/udacity-cloud-devops-capstone
+            docker push 689660317632.dkr.ecr.us-east-1.amazonaws.com/udacity-cloud-devops-capstone:1.0
+workflows:
+  default:
+    jobs:
+      - linter
+      - docker-build: 
+          requires: [linter]
