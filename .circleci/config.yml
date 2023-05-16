@@ -58,6 +58,7 @@ jobs:
       - run: 
           name: Push image to ECR repo
           command: |
+            echo "Region is ${AWS_DEFAULT_REGION}"
             aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 689660317632.dkr.ecr.us-east-1.amazonaws.com/udacity-cloud-devops-capstone
             docker push 689660317632.dkr.ecr.us-east-1.amazonaws.com/udacity-cloud-devops-capstone:1.0
 workflows:
