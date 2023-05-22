@@ -14,7 +14,7 @@ def home():
 @app.route("/hello")
 def hello():
     LOG.info("Received hello request")
-    html = f"<h3>Hello from Thodoris' Cloud Devops Blue Deployment for Capstone project</h3>"
+    html = f"<h3>Hello from Thodoris' Cloud Devops Capstone project</h3>"
     return html.format(format)
 
 if __name__ == "__main__":
