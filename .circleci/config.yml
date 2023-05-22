@@ -67,6 +67,11 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: 
+          name: Install kubectl
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
       - run:
           name: Initialize kubectl
           command: |
@@ -80,7 +85,7 @@ jobs:
           name: Create new deployment
           command: |
             export version=${CIRCLE_WORKFLOW_ID:0:7}
-            export docker-image-url=${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7}
+            export docker-image-url="${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7}"
             envsubst < ./eks/deployment-template.yaml > deployment.yaml
             cat deployment.yaml
             kubectl apply -f deployment.yaml
