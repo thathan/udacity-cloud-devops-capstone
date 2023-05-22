@@ -95,6 +95,7 @@ jobs:
       - run: 
           name: Update service selector to new app label value
           command: |
+            export version=${CIRCLE_WORKFLOW_ID:0:7}
             envsubst < ./eks/service-template.yaml > service.yaml
             cat service.yaml
             kubectl apply -f service.yaml
