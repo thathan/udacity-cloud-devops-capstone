@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-devops-capstone-deployment-${version}
+  namespace: udacity
+  labels:
+    app: capstone
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: capstone-${version}
+  template: 
+    metadata: 
+      name: capstone-pod
+      labels: 
+        app: capstone-${version}
+    spec:
+      containers: # List
+      - name: capstone-container
+        image: ${docker_image_url}
+        ports:
+          - containerPort: 8000    

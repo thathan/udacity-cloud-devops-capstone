@@ -61,9 +61,45 @@ jobs:
             echo "Region is ${AWS_DEFAULT_REGION}"
             aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URL}
             docker push ${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7}
+
+  eks-deploy:
+    docker: 
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Initialize kubectl
+          command: |
+            aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name ${EKS_CLUSTER_NAME}
+      - run: 
+          name: Find name of existing deployment
+          command: |
+            export PREVIOUS_DEPLOYMENT_NAME=$(kubectl get deploy -o json -n udacity | jq '.items[]|select(.spec.template.metadata.labels.app == "capstone")' | jq -r '.metadata.name')
+            echo "Precvious deployment name is ${PREVIOUS_DEPLOYMENT_NAME}"
+      - run: 
+          name: Create new deployment
+          command: |
+            export version=${CIRCLE_WORKFLOW_ID:0:7}
+            export docker-image-url=${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7}
+            envsubst < ./eks/deployment-template.yaml > deployment.yaml
+            cat deployment.yaml
+            kubectl apply -f deployment.yaml
+      - run: 
+          name: Update service selector to new app label value
+          command: |
+            envsubst < ./eks/service-template.yaml > service.yaml
+            cat service.yaml
+            kubectl apply -f service.yaml
+      - run: 
+          name: Cleanup previous deployment
+          command: |
+            echo "Deleting previous deployment"
+            #kubectl -n udacity delete deployment ${PREVIOUS_DEPLOYMENT_NAME}
 workflows:
   default:
     jobs:
       - linter
       - docker-build: 
           requires: [linter]
+      - eks-deploy:
+          requires: [docker-build]
