@@ -79,7 +79,7 @@ jobs:
       - run: 
           name: Create a rolling deployment
           command: |
-            kubectl set image deployment.apps/cloud-devops-capstone-deployment capstone-container=${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7} -n udacity
+            kubectl set image deployment.apps/${EKS_DEPLOYMENT_NAME} capstone-container=${ECR_REPOSITORY_URL}:${CIRCLE_WORKFLOW_ID:0:7} -n udacity
 workflows:
   default:
     jobs:
